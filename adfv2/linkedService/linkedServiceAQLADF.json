@@ -6,7 +6,7 @@
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
 			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=jlazuresqldbserver.database.windows.net;initial catalog=jlazuresqldb;user id=jayli",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkpMQURGMjAyMF85ZWI2NjQ4ZS0zZTQ1LTRiNmYtOGNiMS0zNjZmM2UwMTFhM2UiDQp9"
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkpMQURGMjAyMF83M2QyYjJhNi1jOGExLTRhZTItYjRlNS01ZjM1Njg0ODYyN2UiDQp9"
 		}
 	}
 }
