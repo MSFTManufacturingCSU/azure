@@ -1,0 +1,10 @@
+{
+	"name": "AzureDataLakeStorageADF1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://openhackstorage13.dfs.core.windows.net"
+		}
+	}
+}
