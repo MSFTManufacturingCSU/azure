@@ -1,0 +1,16 @@
+{
+	"name": "SqlServerOnPremise",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=mylocalserver;initial catalog=mylocaldatabase;user id=jayli",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJjNzZmY2Q3OC00ZTRlLTRkZmYtOWM5OC1iYWI3OTI3YWI2MGYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntimeOnPremises",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
