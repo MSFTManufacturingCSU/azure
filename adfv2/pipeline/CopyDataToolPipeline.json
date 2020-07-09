@@ -43,7 +43,10 @@
 							"copyBehavior": "MergeFiles"
 						}
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator"
+					}
 				},
 				"inputs": [
 					{
