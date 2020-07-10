@@ -6,40 +6,30 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "InputParquet",
+						"type": "DatasetReference"
+					},
 					"name": "OldInputData"
 				},
 				{
+					"dataset": {
+						"referenceName": "InputParquet",
+						"type": "DatasetReference"
+					},
 					"name": "InputData"
-				},
-				{
-					"dataset": {
-						"referenceName": "ParquetCrudOutput",
-						"type": "DatasetReference"
-					},
-					"name": "ExistingData"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "ParquetCrudOutput",
-						"type": "DatasetReference"
-					},
-					"name": "ParquetCrudOutput"
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
-					"name": "FilterUpdatedData"
+					"name": "FilterNewAndUpdated"
 				},
 				{
-					"name": "FilterDeletedData"
-				},
-				{
-					"name": "AppendExistingAndInserted"
+					"name": "AlterRow"
 				}
 			],
-			"script": "source(output(\n\t\ttable_name as string,\n\t\tupdate_dt as timestamp,\n\t\tPK as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tmoveFiles: ['/providence-health/input/pk','/providence-health/input/pk/moved'],\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(output(\n\t\tPK as integer,\n\t\tcol1 as string,\n\t\tcol2 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tmoveFiles: ['/providence-health/input/tables','/providence-health/input/tables/moved'],\n\tpartitionBy('roundRobin', 2)) ~> InputData\nsource(output(\n\t\tPK as integer,\n\t\tcol1 as string,\n\t\tcol2 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> ExistingData\nExistingData, InputData exists(ExistingData@PK == InputData@PK,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterUpdatedData\nInputData, OldInputData exists(InputData@PK == PKTable@PK,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterDeletedData\nFilterDeletedData, FilterUpdatedData union(byName: true)~> AppendExistingAndInserted\nAppendExistingAndInserted sink(input(\n\t\tPK as integer,\n\t\tcol1 as string,\n\t\tcol2 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('hash', 1)) ~> ParquetCrudOutput"
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> InputData\nInputData, OldInputData exists(InputData@RecID == OldInputData@RecID && InputData@RecVersion == OldInputData@RecVersion,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNewAndUpdated\nFilterNewAndUpdated alterRow() ~> AlterRow"
 		}
 	}
 }
