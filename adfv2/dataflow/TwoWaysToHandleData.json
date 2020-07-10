@@ -41,14 +41,27 @@
 						"type": "DatasetReference"
 					},
 					"name": "Sink2AzureSQLDB"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlDatabaseSinkDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Sink1AzureSQLDB"
 				}
 			],
 			"transformations": [
 				{
-					"name": "FilterNewAndUpdated"
+					"name": "FilterNewRecords"
+				},
+				{
+					"name": "FilterUpdatedRecords"
+				},
+				{
+					"name": "AlterRow1"
 				}
 			],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> InputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> InputData2\nInputData, OldInputData exists(InputData@RecID == OldInputData@RecID,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNewAndUpdated\nInputData2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ToDWHTruckAndInserts\nFilterNewAndUpdated sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink2AzureSQLDB"
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> InputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> InputData2\nInputData, OldInputData exists(InputData@RecID == OldInputData@RecID,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNewRecords\nOldInputData, InputData exists(OldInputData@RecID == InputData@RecID && InputData@RecVersion != OldInputData@RecVersion,\n\tnegate:false,\n\tbroadcast: 'auto')~> FilterUpdatedRecords\nFilterUpdatedRecords alterRow(updateIf(true())) ~> AlterRow1\nInputData2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ToDWHTruckAndInserts\nFilterNewRecords sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink2AzureSQLDB\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink1AzureSQLDB"
 		}
 	}
 }
