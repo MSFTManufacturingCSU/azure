@@ -18,9 +18,31 @@
 						"type": "DatasetReference"
 					},
 					"name": "InputData"
+				},
+				{
+					"dataset": {
+						"referenceName": "InputParquet",
+						"type": "DatasetReference"
+					},
+					"name": "InputData2"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlDatabaseSinkDataset",
+						"type": "DatasetReference"
+					},
+					"name": "ToDWHTruckAndInserts"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlDatabaseSinkDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Sink2AzureSQLDB"
+				}
+			],
 			"transformations": [
 				{
 					"name": "FilterNewAndUpdated"
@@ -29,7 +51,7 @@
 					"name": "AlterRow"
 				}
 			],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> InputData\nInputData, OldInputData exists(InputData@RecID == OldInputData@RecID && InputData@RecVersion == OldInputData@RecVersion,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNewAndUpdated\nFilterNewAndUpdated alterRow() ~> AlterRow"
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> OldInputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionBy('roundRobin', 2)) ~> InputData\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> InputData2\nInputData, OldInputData exists(InputData@RecID == OldInputData@RecID && InputData@RecVersion == OldInputData@RecVersion,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNewAndUpdated\nFilterNewAndUpdated alterRow(insertIf(FilterNewAndUpdated@VersionID == 1),\n\tupdateIf(FilterNewAndUpdated@VersionID != 1)) ~> AlterRow\nInputData2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ToDWHTruckAndInserts\nAlterRow sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:[(NewAndUpdated@RecID)],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink2AzureSQLDB"
 		}
 	}
 }
