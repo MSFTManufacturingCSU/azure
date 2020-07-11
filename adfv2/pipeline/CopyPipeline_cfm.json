@@ -83,18 +83,6 @@
 							},
 							{
 								"source": {
-									"name": "phone",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "phone",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
 									"name": "store_id",
 									"type": "String",
 									"physicalType": "String"
