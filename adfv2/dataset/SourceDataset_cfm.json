@@ -36,10 +36,6 @@
 				"type": "String"
 			},
 			{
-				"name": "phone",
-				"type": "String"
-			},
-			{
 				"name": "store_id",
 				"type": "String"
 			}
