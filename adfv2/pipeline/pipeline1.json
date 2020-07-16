@@ -16,20 +16,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"wildcardFolderPath": "**",
-							"wildcardFileName": "*.json",
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
-						"referenceName": "Json2",
+						"referenceName": "AzureSqlTable3",
 						"type": "DatasetReference"
 					}
 				}
