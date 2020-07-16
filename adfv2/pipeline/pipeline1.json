@@ -144,10 +144,44 @@
 					"expression": {
 						"value": "@contains(activity('Lookup2').output, 'firstRow')",
 						"type": "Expression"
-					}
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v2set",
+								"value": "no data - empty file reached"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v2set",
+					"value": "great success"
 				}
 			}
 		],
+		"parameters": {
+			"p2set": {
+				"type": "string",
+				"defaultValue": "good parameter"
+			}
+		},
+		"variables": {
+			"v2set": {
+				"type": "String",
+				"defaultValue": "success"
+			}
+		},
 		"annotations": []
 	}
 }
