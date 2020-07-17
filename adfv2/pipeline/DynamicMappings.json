@@ -1,12 +1,64 @@
 {
-	"name": "Copy data from on premise SQL Server to SQL Azure",
+	"name": "DynamicMappings",
 	"properties": {
-		"description": "Copy data from on premise SQL Server to SQL Azure.\n\nYou can also go to \"Copy Data Tool\" to get the pipeline for more connectors and scenarios.",
+		"description": "mapping dynamically from a file to SQL table (columns are mapped based on a configuration file)",
 		"activities": [
 			{
-				"name": "SQL_to_SQLAzure",
-				"description": "Copy data from SQL server to SQL Azure",
+				"name": "Copy data1",
 				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": false,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureSqlTable2",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -18,27 +70,24 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "SqlSource"
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "**",
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
 					},
-					"sink": {
-						"type": "SqlSink",
-						"writeBatchSize": 10000
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
 					},
-					"enableStaging": false,
-					"dataIntegrationUnits": 0
-				},
-				"inputs": [
-					{
-						"referenceName": "DataSource",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DataDestination",
-						"type": "DatasetReference"
-					}
-				]
+					"firstRowOnly": false
+				}
 			}
 		],
 		"annotations": []
