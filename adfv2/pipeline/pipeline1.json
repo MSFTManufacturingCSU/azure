@@ -83,8 +83,7 @@
 										"enablePartitionDiscovery": false
 									},
 									"formatSettings": {
-										"type": "DelimitedTextReadSettings",
-										"skipLineCount": 1
+										"type": "DelimitedTextReadSettings"
 									}
 								},
 								"sink": {
