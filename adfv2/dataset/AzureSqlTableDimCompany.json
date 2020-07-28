@@ -1,0 +1,52 @@
+{
+	"name": "AzureSqlTableDimCompany",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CompanyKey",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CurrencyCode",
+				"type": "varchar"
+			},
+			{
+				"name": "Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Company",
+				"type": "varchar"
+			},
+			{
+				"name": "DW_Id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DW_Batch",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DW_SourceCode",
+				"type": "varchar"
+			},
+			{
+				"name": "DW_TimeStamp",
+				"type": "timestamp"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimCompany"
+		}
+	}
+}
