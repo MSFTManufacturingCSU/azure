@@ -10,6 +10,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "source1"
+				},
+				{
+					"name": "source2"
 				}
 			],
 			"sinks": [],
@@ -21,7 +24,7 @@
 					"name": "DerivedColumn1"
 				}
 			],
-			"script": "source(output(\n\t\tvisit_id as integer,\n\t\tfirst_name as string,\n\t\tlast_name as string,\n\t\tupdated_datetime as timestamp,\n\t\tphone as string,\n\t\tstore_id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nDerivedColumn1 filter(ERROR_FUNCTION('')) ~> Filter1\nsource1 derive(each(match(type == 'integer'), concat($$, '_dev') = $$+visit_id),\n\t\teach(match(startsWith(name, 'updated')), concat($$, '_dev') = toLong(toString($$, \r\n    'yyyyMMddHHmmssSSS')) \r\n    \r\n, concat($$, 'dev2') = addDays($$, 12), concat($$, '_dev3') = toUTC($$), concat($$, '_dev4') = fromUTC($$, 'EST')),\n\t\tphone = iif(rlike(phone, '\\\\d{10}'), phone,'7818886666'),\n\t\tfirst_name = regexReplace(first_name, \"[\\\\x09|\\\\x0D|\\\\x0A|\\\\x20]\", ' '),\n\t\tlast_name = regexReplace(last_name, \"[\\t\\r\\n]\", 'P')) ~> DerivedColumn1"
+			"script": "source(output(\n\t\tvisit_id as integer,\n\t\tfirst_name as string,\n\t\tlast_name as string,\n\t\tupdated_datetime as timestamp,\n\t\tphone as string,\n\t\tstore_id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> source2\nDerivedColumn1 filter(ERROR_FUNCTION('')) ~> Filter1\nsource1 derive(each(match(type=='integer'), concat($$, '_dev') = $$+visit_id),\n\t\teach(match(startsWith(name,'updated')), concat($$, '_dev') = toLong(toString($$, \r\n    'yyyyMMddHHmmssSSS')), concat($$, 'dev2') = addDays($$, 12), concat($$, '_dev3') = toUTC($$), concat($$, '_dev4') = fromUTC($$, 'EST')),\n\t\tphone = iif(rlike(phone, '\\\\d{10}'), phone,'7818886666'),\n\t\tfirst_name = regexReplace(first_name, \"[\\\\x09|\\\\x0D|\\\\x0A|\\\\x20]\", ' '),\n\t\tlast_name = regexReplace(last_name, \"[\\t\\r\\n]\", 'P')) ~> DerivedColumn1"
 		}
 	}
 }
