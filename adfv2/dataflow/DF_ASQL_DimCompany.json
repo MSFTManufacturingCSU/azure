@@ -15,6 +15,10 @@
 					"name": "StageDimCompany"
 				},
 				{
+					"dataset": {
+						"referenceName": "AzureSqlTableDimCompany",
+						"type": "DatasetReference"
+					},
 					"name": "DWDimCompany"
 				}
 			],
@@ -32,7 +36,7 @@
 					"name": "AlterRow"
 				}
 			],
-			"script": "source(output(\n\t\tName as string,\n\t\tCurrencyCode as string,\n\t\tCompany as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> StageDimCompany\nsource(output(\n\t\tCompanyKey as long,\n\t\tCurrencyCode as string,\n\t\tName as string,\n\t\tCompany as string,\n\t\tDW_Id as long,\n\t\tDW_Batch as long,\n\t\tDW_SourceCode as string,\n\t\tDW_TimeStamp as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> DWDimCompany\nStageDimCompany alterRow(upsertIf(true())) ~> AlterRow\nAlterRow sink(input(\n\t\tCompanyKey as long,\n\t\tCurrencyCode as string,\n\t\tName as string,\n\t\tCompany as string,\n\t\tDW_Id as long,\n\t\tDW_Batch as long,\n\t\tDW_SourceCode as string,\n\t\tDW_TimeStamp as binary\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['Company'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCurrencyCode,\n\t\tName,\n\t\tCompany\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimCompany"
+			"script": "source(output(\n\t\tName as string,\n\t\tCurrencyCode as string,\n\t\tCompany as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> StageDimCompany\nsource(output(\n\t\tCompanyKey as long,\n\t\tCurrencyCode as string,\n\t\tName as string,\n\t\tCompany as string,\n\t\tDW_Id as long,\n\t\tDW_Batch as long,\n\t\tDW_SourceCode as string,\n\t\tDW_TimeStamp as binary\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DWDimCompany\nStageDimCompany alterRow(upsertIf(true())) ~> AlterRow\nAlterRow sink(input(\n\t\tCompanyKey as long,\n\t\tCurrencyCode as string,\n\t\tName as string,\n\t\tCompany as string,\n\t\tDW_Id as long,\n\t\tDW_Batch as long,\n\t\tDW_SourceCode as string,\n\t\tDW_TimeStamp as binary\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['Company'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCurrencyCode,\n\t\tName,\n\t\tCompany\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimCompany"
 		}
 	}
 }
