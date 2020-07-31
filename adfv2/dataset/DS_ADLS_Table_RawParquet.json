@@ -39,6 +39,39 @@
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "CompanyKey",
+				"type": "INT64"
+			},
+			{
+				"name": "CurrencyCode",
+				"type": "UTF8"
+			},
+			{
+				"name": "Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Company",
+				"type": "UTF8"
+			},
+			{
+				"name": "DW_Id",
+				"type": "INT64"
+			},
+			{
+				"name": "DW_Batch",
+				"type": "INT64"
+			},
+			{
+				"name": "DW_SourceCode",
+				"type": "UTF8"
+			},
+			{
+				"name": "DW_TimeStamp",
+				"type": "BINARY"
+			}
+		]
 	}
 }
