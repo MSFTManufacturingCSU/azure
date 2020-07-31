@@ -1,0 +1,101 @@
+{
+	"name": "PL_DATA_LS_MSQL_AX2012_TableFull_To_ADLS_Raw",
+	"properties": {
+		"activities": [
+			{
+				"name": "LoadDynamicsTable",
+				"description": "Copy entire table",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "dbo.@{pipeline().parameters.TableName}"
+					},
+					{
+						"name": "Destination",
+						"value": "datalake/@{concat('raw/', pipeline().parameters.TableName)}/@{concat(pipeline().parameters.TableName, '.parquet')}"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureSqlTableDimCompany",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_Table_RawParquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": {
+								"value": "@pipeline().parameters.TableName",
+								"type": "Expression"
+							},
+							"SchemaName": "dbo",
+							"DataSource": "AX2012"
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "DataArea"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"DataSource": {
+				"type": "string",
+				"defaultValue": "AX2012"
+			},
+			"Year": {
+				"type": "string",
+				"defaultValue": "2014"
+			},
+			"Month": {
+				"type": "string",
+				"defaultValue": "01"
+			},
+			"Day": {
+				"type": "string",
+				"defaultValue": "01"
+			}
+		},
+		"folder": {
+			"name": "Generic Data Movement"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"name": "DS_ADLS_Table_RawParquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "DataArea"
+			},
+			"SchemaName": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"DataSource": {
+				"type": "string",
+				"defaultValue": "AX2012"
+			}
+		},
+		"folder": {
+			"name": "Generic"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat(dataset().DataSource, '-', dataset().SchemaName, '-', dataset().TableName, '-snappy.parquet')",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('raw/', dataset().DataSource, '/', dataset().SchemaName,  dataset().TableName)",
+					"type": "Expression"
+				},
+				"fileSystem": "datalake"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
