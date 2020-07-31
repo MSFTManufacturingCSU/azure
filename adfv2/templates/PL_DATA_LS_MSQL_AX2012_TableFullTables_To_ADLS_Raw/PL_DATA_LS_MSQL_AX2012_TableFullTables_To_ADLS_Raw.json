@@ -1,0 +1,338 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name"
+		},
+		"LS_ASQL_MetadataStore": {
+			"type": "string"
+		},
+		"LS_MSQL_DynamicsAX2012": {
+			"type": "string"
+		},
+		"LS_ADLS_BusinessIntelligence": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_DATA_LS_MSQL_AX2012_TableFullTables_To_ADLS_Raw')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LookupTables",
+						"description": "SELECT\t[TableListId],\n\t\t[SchemaName],\n\t\t[TableName]\t\t\nFROM\t[dbo].[Tablelist]\nWHERE\t[IsActive] = 1\n\t\tAND\n\t\t(\n\t\t\t[LoadType] = N'Full'\n\t\t\tOR\n\t\t\t[LoadType] = N'Watermark'\n\t\t);",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT\t[TableListId],\n\t\t[SchemaName],\n\t\t[TableName]\t\t\nFROM\t[dbo].[Tablelist]\nWHERE\t[IsActive] = 1\n\t\tAND\n\t\t(\n\t\t\t[LoadType] = N'Full'\n\t\t\tOR\n\t\t\t[LoadType] = N'Watermark'\n\t\t);",
+								"queryTimeout": "02:00:00"
+							},
+							"dataset": {
+								"referenceName": "DS_ASQL_MetadataStore",
+								"type": "DatasetReference"
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEachTable",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "LookupTables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('LookupTables').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 8,
+							"activities": [
+								{
+									"name": "LoadDynamicsTable",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_DATA_LS_MSQL_AX2012_TableFull_To_ADLS_Raw",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"TableName": {
+												"value": "@item().TableName",
+												"type": "Expression"
+											},
+											"SchemaName": {
+												"value": "@item().SchemaName",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"variables": {
+					"TableNames": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "Generic Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ASQL_MetadataStore')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_DATA_LS_MSQL_AX2012_TableFull_To_ADLS_Raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ASQL_MetadataStore')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('LS_ASQL_MetadataStore')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Generic"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_DATA_LS_MSQL_AX2012_TableFull_To_ADLS_Raw')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LoadDynamicsTable",
+						"description": "Copy entire table",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.@{pipeline().parameters.TableName}"
+							},
+							{
+								"name": "Destination",
+								"value": "datalake/@{concat('raw/', pipeline().parameters.TableName)}/@{concat(pipeline().parameters.TableName, '.parquet')}"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_MSQL_AX2012_Table",
+								"type": "DatasetReference",
+								"parameters": {
+									"TablelName": {
+										"value": "@pipeline().parameters.TableName",
+										"type": "Expression"
+									},
+									"SchemaName": {
+										"value": "@pipeline().parameters.SchemaName",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_ADLS_Table_RawParquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"TableName": {
+										"value": "@pipeline().parameters.TableName",
+										"type": "Expression"
+									},
+									"SchemaName": "dbo",
+									"DataSource": "AX2012"
+								}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"TableName": {
+						"type": "string",
+						"defaultValue": "DataArea"
+					},
+					"SchemaName": {
+						"type": "string",
+						"defaultValue": "dbo"
+					},
+					"DataSource": {
+						"type": "string",
+						"defaultValue": "AX2012"
+					},
+					"Year": {
+						"type": "string",
+						"defaultValue": "2014"
+					},
+					"Month": {
+						"type": "string",
+						"defaultValue": "01"
+					},
+					"Day": {
+						"type": "string",
+						"defaultValue": "01"
+					}
+				},
+				"folder": {
+					"name": "Generic Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_MSQL_AX2012_Table')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_Table_RawParquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_MSQL_AX2012_Table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('LS_MSQL_DynamicsAX2012')]",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TablelName": {
+						"type": "string",
+						"defaultValue": "DataArea"
+					},
+					"SchemaName": {
+						"type": "string",
+						"defaultValue": "dbo"
+					}
+				},
+				"folder": {
+					"name": "Generic"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TablelName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Table_RawParquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('LS_ADLS_BusinessIntelligence')]",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TableName": {
+						"type": "string",
+						"defaultValue": "DataArea"
+					},
+					"SchemaName": {
+						"type": "string",
+						"defaultValue": "dbo"
+					},
+					"DataSource": {
+						"type": "string",
+						"defaultValue": "AX2012"
+					}
+				},
+				"folder": {
+					"name": "Generic"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().DataSource, '-', dataset().SchemaName, '-', dataset().TableName, '-snappy.parquet')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat('raw/', dataset().DataSource, '/', dataset().SchemaName,  dataset().TableName)",
+							"type": "Expression"
+						},
+						"fileSystem": "datalake"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		}
+	]
+}
