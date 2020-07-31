@@ -1,6 +1,7 @@
 {
-	"name": "pipeline2",
+	"name": "pipeline4regex",
 	"properties": {
+		"description": "dataflow2 has derived column transformation that shows how to use regex and handling of time date",
 		"activities": [
 			{
 				"name": "Execute Pipeline2",
