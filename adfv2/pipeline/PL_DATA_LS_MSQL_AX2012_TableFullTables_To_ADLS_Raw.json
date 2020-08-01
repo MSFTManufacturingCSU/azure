@@ -1,0 +1,88 @@
+{
+	"name": "PL_DATA_LS_MSQL_AX2012_TableFullTables_To_ADLS_Raw",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookupTables",
+				"description": "SELECT\t[TableListId],\n\t\t[SchemaName],\n\t\t[TableName]\t\t\nFROM\t[dbo].[Tablelist]\nWHERE\t[IsActive] = 1\n\t\tAND\n\t\t(\n\t\t\t[LoadType] = N'Full'\n\t\t\tOR\n\t\t\t[LoadType] = N'Watermark'\n\t\t);",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT\t[TableListId],\n\t\t[SchemaName],\n\t\t[TableName]\t\t\nFROM\t[dbo].[Tablelist]\nWHERE\t[IsActive] = 1\n\t\tAND\n\t\t(\n\t\t\t[LoadType] = N'Full'\n\t\t\tOR\n\t\t\t[LoadType] = N'Watermark'\n\t\t);",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "DS_ASQL_MetadataStore",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupTables').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 8,
+					"activities": [
+						{
+							"name": "LoadDynamicsTable",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_DATA_LS_MSQL_AX2012_TableFull_To_ADLS_Raw",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"TableName": {
+										"value": "@item().TableName",
+										"type": "Expression"
+									},
+									"SchemaName": {
+										"value": "@item().SchemaName",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"TableNames": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "Generic Data Movement"
+		},
+		"annotations": []
+	}
+}

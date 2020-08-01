@@ -38,6 +38,103 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "CompanyKey",
+									"type": "Int64",
+									"physicalType": "bigint"
+								},
+								"sink": {
+									"name": "CompanyKey",
+									"type": "Int64",
+									"physicalType": "INT64"
+								}
+							},
+							{
+								"source": {
+									"name": "CurrencyCode",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CurrencyCode",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Name",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "Name",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Company",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "Company",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_Id",
+									"type": "Int64",
+									"physicalType": "bigint"
+								},
+								"sink": {
+									"name": "DW_Id",
+									"type": "Int64",
+									"physicalType": "INT64"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_Batch",
+									"type": "Int64",
+									"physicalType": "bigint"
+								},
+								"sink": {
+									"name": "DW_Batch",
+									"type": "Int64",
+									"physicalType": "INT64"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_SourceCode",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DW_SourceCode",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_TimeStamp",
+									"physicalType": "timestamp"
+								},
+								"sink": {
+									"name": "DW_TimeStamp",
+									"type": "Byte[]",
+									"physicalType": "BINARY"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
