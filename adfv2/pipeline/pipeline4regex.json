@@ -53,24 +53,126 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DynamicsAXSource",
-						"httpRequestTimeout": "00:05:00"
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00"
 					},
 					"sink": {
-						"type": "AzureSqlSink"
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "CompanyKey",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "CompanyKey",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Company",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Company",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CurrencyCode",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CurrencyCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Company",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Company",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_Id",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "DW_Id",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_Batch",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "DW_Batch",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_SourceCode",
+									"type": "String"
+								},
+								"sink": {
+									"name": "DW_SourceCode",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DW_TimeStamp"
+								},
+								"sink": {
+									"name": "DW_TimeStamp",
+									"type": "Byte[]"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
-						"referenceName": "DynamicsAXResource1",
+						"referenceName": "AzureSqlTableDimCompany",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "AzureSqlDatabaseSinkDataset",
-						"type": "DatasetReference"
+						"referenceName": "DS_ADLS_Table_RawParquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"TableName": "DataArea",
+							"SchemaName": "dbo",
+							"DataSource": "AX2012"
+						}
 					}
 				]
 			}
