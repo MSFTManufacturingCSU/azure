@@ -1,0 +1,30 @@
+{
+	"name": "Parquet2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RawStreaming",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cloudstreamingfolder": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().cloudstreamingfolder",
+					"type": "Expression"
+				},
+				"folderPath": "cloudStreaming",
+				"fileSystem": "raw"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

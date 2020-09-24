@@ -1,0 +1,17 @@
+{
+	"name": "AzureStreamingTables",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzuresTreamingDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "RawTables"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

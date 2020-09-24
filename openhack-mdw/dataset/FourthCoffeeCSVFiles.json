@@ -1,0 +1,22 @@
+{
+	"name": "FourthCoffeeCSVFiles",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "FileServerFourthCoffee",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"folderPath": "Rentals"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

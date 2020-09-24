@@ -1,0 +1,31 @@
+{
+	"name": "CloudStreamingTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzuresTreamingDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cloudstreamingtable": {
+				"type": "string"
+			},
+			"cloudstreamingschema": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().cloudstreamingschema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().cloudstreamingtable",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
