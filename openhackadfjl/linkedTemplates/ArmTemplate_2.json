@@ -1,0 +1,569 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "openhackadfjl"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/FourthCoffeeCSVFiles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FileServerFourthCoffee",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": "Rentals"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServerTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServerVanArsDelLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dbschema": {
+						"type": "string"
+					},
+					"dbtable": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().dbschema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().dbtable",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/VanArsDelSQLViewDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServerVanArsDelLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TABLE_SCHEMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TABLE_NAME",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "StageTables"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/flattenMovies')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "JsonFromRaw",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Parquet4OnlineMoviesFlattenedDS",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Flatten1"
+						}
+					],
+					"script": "source(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\twildcardPaths:['movies/**']) ~> source1\nsource1 foldDown(unroll(actors, actors),\n\tmapColumn(\n\t\t{_attachments},\n\t\t{_etag},\n\t\t{_rid},\n\t\t{_self},\n\t\t{_ts},\n\t\tavailabilityDate,\n\t\tgenre,\n\t\tid,\n\t\trating,\n\t\treleaseYear,\n\t\truntime,\n\t\tstreamingAvailabilityDate,\n\t\ttier,\n\t\ttitle,\n\t\tname = actors.name\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> Flatten1\nFlatten1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['onlineMoviesFlattened'],\n\ttruncate: true,\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/stageOnpremiseMovieDF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "VanarsdelMovieDS",
+								"type": "DatasetReference"
+							},
+							"name": "VanarsdelMovieSr"
+						},
+						{
+							"dataset": {
+								"referenceName": "VanardselMovieMapDS",
+								"type": "DatasetReference"
+							},
+							"name": "VanarsdelMovieMap"
+						},
+						{
+							"dataset": {
+								"referenceName": "DelimitedFourthCoffeeMovieDS",
+								"type": "DatasetReference"
+							},
+							"name": "FourthCoffeeMovieSr"
+						},
+						{
+							"dataset": {
+								"referenceName": "FourthCoffeeMovieMapDS",
+								"type": "DatasetReference"
+							},
+							"name": "FourthCoffeeMovieMap"
+						},
+						{
+							"dataset": {
+								"referenceName": "VanarsdelMovieActorDS",
+								"type": "DatasetReference"
+							},
+							"name": "VanarsdelMoveActors"
+						},
+						{
+							"dataset": {
+								"referenceName": "VanarsdelActorsDS",
+								"type": "DatasetReference"
+							},
+							"name": "VanarsdelActorsSr"
+						},
+						{
+							"dataset": {
+								"referenceName": "FourthCoffeeMovieActorsDS",
+								"type": "DatasetReference"
+							},
+							"name": "FourthCoffeeMovieActorsSr"
+						},
+						{
+							"dataset": {
+								"referenceName": "FourthCoffeeActorsDS",
+								"type": "DatasetReference"
+							},
+							"name": "FourthCoffeeActorsSr"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "combinedStageMovies",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "CombinedMovieActorDS",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "Select1"
+						},
+						{
+							"name": "Join2"
+						},
+						{
+							"name": "Select2"
+						},
+						{
+							"name": "Join3"
+						},
+						{
+							"name": "Select3"
+						},
+						{
+							"name": "Join4"
+						},
+						{
+							"name": "Select4"
+						},
+						{
+							"name": "DerivedColumn1"
+						},
+						{
+							"name": "Union1"
+						},
+						{
+							"name": "DerivedColumn2"
+						},
+						{
+							"name": "DerivedColumn3"
+						},
+						{
+							"name": "Join5"
+						},
+						{
+							"name": "Select5"
+						},
+						{
+							"name": "Join6"
+						},
+						{
+							"name": "Select6"
+						},
+						{
+							"name": "DerivedColumn4"
+						},
+						{
+							"name": "Union2"
+						}
+					],
+					"script": "source(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as integer,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMovieSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMovieMap\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as short,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieMap\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMoveActors\nsource(output(\n\t\tActorID as string,\n\t\tActorName as string,\n\t\tGender as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelActorsSr\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieActorsSr\nsource(output(\n\t\tActorID as string,\n\t\tActorName as string,\n\t\tGender as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeActorsSr\nVanarsdelMovieSr, VanarsdelMovieMap join(VanarsdelMovieSr@MovieID == VanarsdelMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tMovieID = VanarsdelMovieSr@MovieID,\n\t\tMovieTitle,\n\t\tCategory,\n\t\tRating,\n\t\tRunTimeMin,\n\t\tReleaseDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nFourthCoffeeMovieSr, FourthCoffeeMovieMap join(FourthCoffeeMovieSr@MovieID == FourthCoffeeMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join2\nJoin2 select(mapColumn(\n\t\tMovieID = FourthCoffeeMovieSr@MovieID,\n\t\tMovieTitle,\n\t\tCategory,\n\t\tRating,\n\t\tRunTimeMin,\n\t\tReleaseDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nVanarsdelMoveActors, VanarsdelMovieMap join(VanarsdelMoveActors@MovieID == VanarsdelMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join3\nJoin3 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID = VanarsdelMoveActors@MovieID,\n\t\tActorID,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select3\nSelect3, VanarsdelActorsSr join(Select3@ActorID == VanarsdelActorsSr@ActorID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join4\nJoin4 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID,\n\t\tActorID = Select3@ActorID,\n\t\tOnlineMovieID,\n\t\tActorName,\n\t\tGender\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select4\nSelect4 derive(SourceSystemId = 3) ~> DerivedColumn1\nDerivedColumn2, DerivedColumn3 union(byName: true)~> Union1\nSelect1 derive(SourceSystemId = 3,\n\t\tReleaseDate = toDate(ReleaseDate, \"MM-dd-yyyy\")) ~> DerivedColumn2\nSelect2 derive(SourceSystemId = 2,\n\t\tReleaseDate = toDate(ReleaseDate, \"MM-dd-yyyy\")) ~> DerivedColumn3\nFourthCoffeeMovieActorsSr, FourthCoffeeMovieMap join(FourthCoffeeMovieActorsSr@MovieID == FourthCoffeeMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join5\nJoin5 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID = FourthCoffeeMovieActorsSr@MovieID,\n\t\tActorID,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select5\nSelect5, FourthCoffeeActorsSr join(Select5@ActorID == FourthCoffeeActorsSr@ActorID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join6\nJoin6 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID,\n\t\tActorID = Select5@ActorID,\n\t\tOnlineMovieID,\n\t\tActorName,\n\t\tGender\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select6\nSelect6 derive(SourceSystemId = 2) ~> DerivedColumn4\nDerivedColumn1, DerivedColumn4 union(byName: true)~> Union2\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['combinedOnPremiseMovies'],\n\ttruncate: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1\nUnion2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['combinedMovieActors'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink2"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/fourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"fileFilter": "*.csv"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "FourthCoffeeCSVFiles",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "rawFourthCoffeeCSV",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2020-09-24T16:07:20Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/FourthCoffeeCSVFiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/stageMovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "flattenMovies",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/flattenMovies')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/stageOnpremiseMovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "stageOnpremiseMovieDF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VanarsdelMovieSr": {},
+									"VanarsdelMovieMap": {},
+									"FourthCoffeeMovieSr": {},
+									"FourthCoffeeMovieMap": {},
+									"VanarsdelMoveActors": {},
+									"VanarsdelActorsSr": {},
+									"FourthCoffeeMovieActorsSr": {},
+									"FourthCoffeeActorsSr": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/stageOnpremiseMovieDF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/vanarsdel')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "VanArsDelSQLViewDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SqlServerTable1",
+											"type": "DatasetReference",
+											"parameters": {
+												"dbschema": {
+													"value": "@item().TABLE_SCHEMA",
+													"type": "Expression"
+												},
+												"dbtable": "@item().TABLE_NAME"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Parquet4OnPremSQL",
+											"type": "DatasetReference",
+											"parameters": {
+												"filename": {
+													"value": "@item().TABLE_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2020-09-24T16:02:26Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/VanArsDelSQLViewDataset')]",
+				"[concat(variables('factoryId'), '/datasets/SqlServerTable1')]"
+			]
+		}
+	]
+}
