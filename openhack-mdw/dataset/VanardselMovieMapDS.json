@@ -1,0 +1,30 @@
+{
+	"name": "VanardselMovieMapDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage4VanArsDel",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "OnlineMovieMappings",
+				"folderPath": "vanarsdel",
+				"fileSystem": "raw"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "MovieID",
+				"type": "UTF8"
+			},
+			{
+				"name": "OnlineMovieID",
+				"type": "UTF8"
+			}
+		]
+	}
+}

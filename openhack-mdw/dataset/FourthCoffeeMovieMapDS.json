@@ -1,0 +1,33 @@
+{
+	"name": "FourthCoffeeMovieMapDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RawMovie",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "OnlineMovieMappings.csv",
+				"folderPath": "fourthCoffee",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "MovieID",
+				"type": "String"
+			},
+			{
+				"name": "OnlineMovieID",
+				"type": "String"
+			}
+		]
+	}
+}

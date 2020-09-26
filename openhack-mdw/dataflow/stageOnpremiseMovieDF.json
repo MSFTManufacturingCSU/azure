@@ -1,0 +1,100 @@
+{
+	"name": "stageOnpremiseMovieDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "VanarsdelMovieDS",
+						"type": "DatasetReference"
+					},
+					"name": "VanarsdelMovieSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "VanardselMovieMapDS",
+						"type": "DatasetReference"
+					},
+					"name": "VanarsdelMovieMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedFourthCoffeeMovieDS",
+						"type": "DatasetReference"
+					},
+					"name": "FourthCoffeeMovieSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "FourthCoffeeMovieMapDS",
+						"type": "DatasetReference"
+					},
+					"name": "FourthCoffeeMovieMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "VanarsdelMovieActorDS",
+						"type": "DatasetReference"
+					},
+					"name": "VanarsdelMoveActors"
+				},
+				{
+					"dataset": {
+						"referenceName": "VanarsdelActorsDS",
+						"type": "DatasetReference"
+					},
+					"name": "VanarsdelActorsSr"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "combinedStageMovies",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Join1"
+				},
+				{
+					"name": "Select1"
+				},
+				{
+					"name": "Join2"
+				},
+				{
+					"name": "Select2"
+				},
+				{
+					"name": "Join3"
+				},
+				{
+					"name": "Select3"
+				},
+				{
+					"name": "Join4"
+				},
+				{
+					"name": "Select4"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Union1"
+				},
+				{
+					"name": "DerivedColumn2"
+				},
+				{
+					"name": "DerivedColumn3"
+				}
+			],
+			"script": "source(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as integer,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMovieSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMovieMap\nsource(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as short,\n\t\tReleaseDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieMap\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMoveActors\nsource(output(\n\t\tActorID as string,\n\t\tActorName as string,\n\t\tGender as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelActorsSr\nVanarsdelMovieSr, VanarsdelMovieMap join(VanarsdelMovieSr@MovieID == VanarsdelMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tMovieID = VanarsdelMovieSr@MovieID,\n\t\tMovieTitle,\n\t\tCategory,\n\t\tRating,\n\t\tRunTimeMin,\n\t\tReleaseDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nFourthCoffeeMovieSr, FourthCoffeeMovieMap join(FourthCoffeeMovieSr@MovieID == FourthCoffeeMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join2\nJoin2 select(mapColumn(\n\t\tMovieID = FourthCoffeeMovieSr@MovieID,\n\t\tMovieTitle,\n\t\tCategory,\n\t\tRating,\n\t\tRunTimeMin,\n\t\tReleaseDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nVanarsdelMoveActors, VanarsdelMovieMap join(VanarsdelMoveActors@MovieID == VanarsdelMovieMap@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join3\nJoin3 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID = VanarsdelMoveActors@MovieID,\n\t\tActorID,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select3\nSelect3, VanarsdelActorsSr join(Select3@ActorID == VanarsdelActorsSr@ActorID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join4\nJoin4 select(mapColumn(\n\t\tMovieActorID,\n\t\tMovieID,\n\t\tActorID = Select3@ActorID,\n\t\tOnlineMovieID,\n\t\tActorName,\n\t\tGender\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select4\nSelect4 derive(SourceSystemId = 3) ~> DerivedColumn1\nDerivedColumn2, DerivedColumn3 union(byName: true)~> Union1\nSelect1 derive(SourceSystemId = 3,\n\t\tReleaseDate = toDate(ReleaseDate, \"MM-dd-yyyy\")) ~> DerivedColumn2\nSelect2 derive(SourceSystemId = 2,\n\t\tReleaseDate = toDate(ReleaseDate, \"MM-dd-yyyy\")) ~> DerivedColumn3\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['combinedOnPremiseMovies'],\n\ttruncate: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+		}
+	}
+}
