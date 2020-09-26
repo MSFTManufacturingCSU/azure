@@ -1,0 +1,195 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "openhackadfjl"
+		},
+		"AzureDataLakeStorage4VanArsDel_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage4VanArsDel'"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
+		"AzuresTreamingDatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzuresTreamingDatabase'"
+		},
+		"CosmosDb1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CosmosDb1'"
+		},
+		"FileServerFourthCoffee_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'FileServerFourthCoffee'"
+		},
+		"RawCloudSales_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'RawCloudSales'"
+		},
+		"RawMovie_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'RawMovie'"
+		},
+		"RawStreaming_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'RawStreaming'"
+		},
+		"SqlServerVanArsDelLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServerVanArsDelLinkedService'"
+		},
+		"StagingDataLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'StagingDataLinkedService'"
+		},
+		"openhackStorageAcctLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'openhackStorageAcctLinkedService'"
+		},
+		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "c:\\"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "openhackadmin"
+		},
+		"RawCloudSales_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawMovie_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawStreaming_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"StagingDataLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "openhackadfjl_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureDataLakeStorage4VanArsDel_accountKey": {
+						"value": "[parameters('AzureDataLakeStorage4VanArsDel_accountKey')]"
+					},
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
+					},
+					"AzuresTreamingDatabase_connectionString": {
+						"value": "[parameters('AzuresTreamingDatabase_connectionString')]"
+					},
+					"CosmosDb1_connectionString": {
+						"value": "[parameters('CosmosDb1_connectionString')]"
+					},
+					"RawCloudSales_accountKey": {
+						"value": "[parameters('RawCloudSales_accountKey')]"
+					},
+					"RawMovie_accountKey": {
+						"value": "[parameters('RawMovie_accountKey')]"
+					},
+					"RawStreaming_accountKey": {
+						"value": "[parameters('RawStreaming_accountKey')]"
+					},
+					"StagingDataLinkedService_accountKey": {
+						"value": "[parameters('StagingDataLinkedService_accountKey')]"
+					},
+					"openhackStorageAcctLinkedService_accountKey": {
+						"value": "[parameters('openhackStorageAcctLinkedService_accountKey')]"
+					},
+					"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage4VanArsDel_properties_typeProperties_url')]"
+					},
+					"RawCloudSales_properties_typeProperties_url": {
+						"value": "[parameters('RawCloudSales_properties_typeProperties_url')]"
+					},
+					"RawMovie_properties_typeProperties_url": {
+						"value": "[parameters('RawMovie_properties_typeProperties_url')]"
+					},
+					"RawStreaming_properties_typeProperties_url": {
+						"value": "[parameters('RawStreaming_properties_typeProperties_url')]"
+					},
+					"StagingDataLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('StagingDataLinkedService_properties_typeProperties_url')]"
+					},
+					"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('openhackStorageAcctLinkedService_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "openhackadfjl_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"FileServerFourthCoffee_password": {
+						"value": "[parameters('FileServerFourthCoffee_password')]"
+					},
+					"SqlServerVanArsDelLinkedService_connectionString": {
+						"value": "[parameters('SqlServerVanArsDelLinkedService_connectionString')]"
+					},
+					"FileServerFourthCoffee_properties_typeProperties_host": {
+						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_host')]"
+					},
+					"FileServerFourthCoffee_properties_typeProperties_userId": {
+						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_userId')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'openhackadfjl_ArmTemplate_0')]"
+			]
+		}
+	]
+}

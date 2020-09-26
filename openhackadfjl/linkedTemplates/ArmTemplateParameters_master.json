@@ -1,0 +1,72 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "openhackadfjl"
+		},
+		"AzureDataLakeStorage4VanArsDel_accountKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"AzuresTreamingDatabase_connectionString": {
+			"value": ""
+		},
+		"CosmosDb1_connectionString": {
+			"value": ""
+		},
+		"FileServerFourthCoffee_password": {
+			"value": ""
+		},
+		"RawCloudSales_accountKey": {
+			"value": ""
+		},
+		"RawMovie_accountKey": {
+			"value": ""
+		},
+		"RawStreaming_accountKey": {
+			"value": ""
+		},
+		"SqlServerVanArsDelLinkedService_connectionString": {
+			"value": ""
+		},
+		"StagingDataLinkedService_accountKey": {
+			"value": ""
+		},
+		"openhackStorageAcctLinkedService_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_host": {
+			"value": "c:\\"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_userId": {
+			"value": "openhackadmin"
+		},
+		"RawCloudSales_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawMovie_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawStreaming_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"StagingDataLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
