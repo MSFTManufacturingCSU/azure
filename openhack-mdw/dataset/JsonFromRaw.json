@@ -1,0 +1,18 @@
+{
+	"name": "JsonFromRaw",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RawMovie",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "movies",
+				"fileSystem": "raw"
+			}
+		}
+	}
+}
