@@ -522,7 +522,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "dataflow1",
+						"name": "stageOnPremiseMoviesDF",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
