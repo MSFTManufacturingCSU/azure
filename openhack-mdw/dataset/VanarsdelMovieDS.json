@@ -1,0 +1,46 @@
+{
+	"name": "VanarsdelMovieDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage4VanArsDel",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Movies",
+				"folderPath": "vanarsdel",
+				"fileSystem": "raw"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "MovieID",
+				"type": "UTF8"
+			},
+			{
+				"name": "MovieTitle",
+				"type": "UTF8"
+			},
+			{
+				"name": "Category",
+				"type": "UTF8"
+			},
+			{
+				"name": "Rating",
+				"type": "UTF8"
+			},
+			{
+				"name": "RunTimeMin",
+				"type": "INT32"
+			},
+			{
+				"name": "ReleaseDate",
+				"type": "UTF8"
+			}
+		]
+	}
+}
