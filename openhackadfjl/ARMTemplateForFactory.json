@@ -480,7 +480,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "dataflow1",
+						"name": "dataflow-onlinefinalcatalog",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -500,7 +500,6 @@
 									"onpremisescombinedmovies": {},
 									"onpremisescombinedmovieactors": {},
 									"onlinemovies": {},
-									"finalOnpremisesCatalog": {},
 									"finalOnlineMovieCatalog": {}
 								}
 							},
@@ -1336,31 +1335,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ParquetFinalOnpremisesCatalog')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "StagingDataLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "catalog/initialLoad",
-						"fileSystem": "prod"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/StagingDataLinkedService')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Parquet4OnPremSQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1410,6 +1384,56 @@
 						"type": "AzureBlobFSLocation",
 						"folderPath": "onlineMovies",
 						"fileSystem": "stage"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/StagingDataLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ParquetFinalOnlineCatalogDS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "catalog/initialLoad",
+						"fileSystem": "prod"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/StagingDataLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ParquetFinalOnpremisesCatalog')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "catalog/initialLoad",
+						"fileSystem": "prod"
 					},
 					"compressionCodec": "snappy"
 				},
@@ -2327,13 +2351,6 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ParquetFinalOnpremisesCatalog",
-								"type": "DatasetReference"
-							},
-							"name": "finalOnpremisesCatalog"
-						},
-						{
-							"dataset": {
 								"referenceName": "ParquetFinalOnlineCatalogDS",
 								"type": "DatasetReference"
 							},
@@ -2348,9 +2365,6 @@
 							"name": "Select1"
 						},
 						{
-							"name": "Join2"
-						},
-						{
 							"name": "DerivedColumn1"
 						},
 						{
@@ -2363,14 +2377,13 @@
 							"name": "Join3"
 						}
 					],
-					"script": "source(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as integer,\n\t\tReleaseDate as date,\n\t\tOnlineMovieID as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovies\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string,\n\t\tOnlineMovieID as string,\n\t\tActorName as string,\n\t\tGender as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovieactors\nsource(output(\n\t\tSourceSystemId as integer,\n\t\tSourceSystemMovieId as string,\n\t\tPhysicalAvailabilityDate as timestamp,\n\t\tStreamingAvailabilityDate as timestamp,\n\t\tGenre as string,\n\t\tTitle as string,\n\t\tRating as string,\n\t\tRuntimeMinutes as short,\n\t\tTheatricalReleaseYear as short,\n\t\tActorName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onlinemovies\nonpremisescombinedmovies, onpremisescombinedmovieactors join(onpremisescombinedmovies@OnlineMovieID == onpremisescombinedmovieactors@OnlineMovieID,\n\tjoinType:'right',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tSourceSystemMovieId = onpremisescombinedmovieactors@MovieID,\n\t\tTitle = MovieTitle,\n\t\tGenre = Category,\n\t\tRating,\n\t\tRuntimeMinutes = RunTimeMin,\n\t\tTheatricalReleaseDate = ReleaseDate,\n\t\tActorId = ActorID,\n\t\tSouthridgeMovieId = onpremisescombinedmovieactors@OnlineMovieID,\n\t\tActorName,\n\t\tActorGender = Gender,\n\t\tSourceSystemId = onpremisescombinedmovieactors@SourceSystemId\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nDerivedColumn2, Select2 join(Select1@SouthridgeMovieId == Select2@SouthridgeMovieId\n\t&& lower(Select1@ActorName) == lower(Select2@ActorName),\n\tjoinType:'right',\n\tbroadcast: 'auto')~> Join2\nonlinemovies derive(SouthridgeMovieId = SourceSystemMovieId,\n\t\tActorId = 0,\n\t\tGender = \"NULL\") ~> DerivedColumn1\nSelect1 derive(PhysicalAvailabilityDate = currentDate(),\n\t\tStreamingAvailabilityDate = currentDate()) ~> DerivedColumn2\nDerivedColumn1 select(mapColumn(\n\t\tSourceSystemId,\n\t\tSourceSystemMovieId,\n\t\tPhysicalAvailabilityDate,\n\t\tStreamingAvailabilityDate,\n\t\tGenre,\n\t\tTitle,\n\t\tRating,\n\t\tRuntimeMinutes,\n\t\tTheatricalReleaseYear,\n\t\tActorName,\n\t\tSouthridgeMovieId,\n\t\tActorId,\n\t\tGender\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nSelect2, DerivedColumn2 join(Select2@SouthridgeMovieId == Select1@SouthridgeMovieId\n\t&& lower(Select2@ActorName) == lower(Select1@ActorName),\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join3\nJoin2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['finalOnPremisesCatalog'],\n\tmapColumn(\n\t\tSourceSystemId = Select1@SourceSystemId,\n\t\tSourceSystemMovieId = Select1@SourceSystemMovieId,\n\t\tSouthridgeMovieId = DerivedColumn1@SouthridgeMovieId,\n\t\tPhysicalAvailabilityDate = Select2@PhysicalAvailabilityDate,\n\t\tStreamingAvailabilityDate = Select2@StreamingAvailabilityDate,\n\t\tGenre = Select1@Genre,\n\t\tTitle = Select1@Title,\n\t\tRating = Select1@Rating,\n\t\tRuntimeMinutes = Select1@RuntimeMinutes,\n\t\tTheatricalReleaseDate,\n\t\tActorName = onlinemovies@ActorName,\n\t\tActorId = Select1@ActorId,\n\t\tActorGender\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> finalOnpremisesCatalog\nJoin3 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['finalOnlineCatalog'],\n\tmapColumn(\n\t\tSourceSystemId = Select2@SourceSystemId,\n\t\tSourceSystemMovieId = Select2@SourceSystemMovieId,\n\t\tSouthridgeMovieId = Select2@SouthridgeMovieId,\n\t\tPhysicalAvailabilityDate = Select2@PhysicalAvailabilityDate,\n\t\tStreamingAvailabilityDate = Select2@StreamingAvailabilityDate,\n\t\tGenre = Select2@Genre,\n\t\tTitle = Select2@Title,\n\t\tRating = Select2@Rating,\n\t\tRuntimeMinutes = Select2@RuntimeMinutes,\n\t\tTheatricalReleaseYear,\n\t\tActorName = Select2@ActorName,\n\t\tActorId = Select1@ActorId,\n\t\tActorGender\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> finalOnlineMovieCatalog"
+					"script": "source(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as integer,\n\t\tReleaseDate as date,\n\t\tOnlineMovieID as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovies\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string,\n\t\tOnlineMovieID as string,\n\t\tActorName as string,\n\t\tGender as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovieactors\nsource(output(\n\t\tSourceSystemId as integer,\n\t\tSourceSystemMovieId as string,\n\t\tPhysicalAvailabilityDate as timestamp,\n\t\tStreamingAvailabilityDate as timestamp,\n\t\tGenre as string,\n\t\tTitle as string,\n\t\tRating as string,\n\t\tRuntimeMinutes as short,\n\t\tTheatricalReleaseYear as short,\n\t\tActorName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onlinemovies\nonpremisescombinedmovies, onpremisescombinedmovieactors join(onpremisescombinedmovies@OnlineMovieID == onpremisescombinedmovieactors@OnlineMovieID,\n\tjoinType:'right',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tSourceSystemMovieId = onpremisescombinedmovieactors@MovieID,\n\t\tTitle = MovieTitle,\n\t\tGenre = Category,\n\t\tRating,\n\t\tRuntimeMinutes = RunTimeMin,\n\t\tTheatricalReleaseDate = ReleaseDate,\n\t\tActorId = ActorID,\n\t\tSouthridgeMovieId = onpremisescombinedmovieactors@OnlineMovieID,\n\t\tActorName,\n\t\tActorGender = Gender,\n\t\tSourceSystemId = onpremisescombinedmovieactors@SourceSystemId\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nonlinemovies derive(SouthridgeMovieId = SourceSystemMovieId,\n\t\tActorId = 0,\n\t\tGender = \"NULL\") ~> DerivedColumn1\nSelect1 derive(PhysicalAvailabilityDate = currentDate(),\n\t\tStreamingAvailabilityDate = currentDate()) ~> DerivedColumn2\nDerivedColumn1 select(mapColumn(\n\t\tSourceSystemId,\n\t\tSourceSystemMovieId,\n\t\tPhysicalAvailabilityDate,\n\t\tStreamingAvailabilityDate,\n\t\tGenre,\n\t\tTitle,\n\t\tRating,\n\t\tRuntimeMinutes,\n\t\tTheatricalReleaseYear,\n\t\tActorName,\n\t\tSouthridgeMovieId,\n\t\tActorId,\n\t\tGender\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nSelect2, DerivedColumn2 join(Select2@SouthridgeMovieId == Select1@SouthridgeMovieId\n\t&& lower(Select2@ActorName) == lower(Select1@ActorName),\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join3\nJoin3 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['finalOnlineCatalog'],\n\tmapColumn(\n\t\tSourceSystemId = Select2@SourceSystemId,\n\t\tSourceSystemMovieId = Select2@SourceSystemMovieId,\n\t\tSouthridgeMovieId = Select2@SouthridgeMovieId,\n\t\tPhysicalAvailabilityDate = Select2@PhysicalAvailabilityDate,\n\t\tStreamingAvailabilityDate = Select2@StreamingAvailabilityDate,\n\t\tGenre = Select2@Genre,\n\t\tTitle = Select2@Title,\n\t\tRating = Select2@Rating,\n\t\tRuntimeMinutes = Select2@RuntimeMinutes,\n\t\tTheatricalReleaseYear,\n\t\tActorName = Select2@ActorName,\n\t\tActorId = Select1@ActorId,\n\t\tActorGender\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> finalOnlineMovieCatalog"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ParquetOnpremiseMovies')]",
 				"[concat(variables('factoryId'), '/datasets/ParquetOnpremisesMovieActors')]",
 				"[concat(variables('factoryId'), '/datasets/ParquetOnlineMovies')]",
-				"[concat(variables('factoryId'), '/datasets/ParquetFinalOnpremisesCatalog')]",
 				"[concat(variables('factoryId'), '/datasets/ParquetFinalOnlineCatalogDS')]"
 			]
 		},
@@ -2605,31 +2618,6 @@
 				"[concat(variables('factoryId'), '/datasets/FourthCoffeeActorsDS')]",
 				"[concat(variables('factoryId'), '/datasets/combinedStageMovies')]",
 				"[concat(variables('factoryId'), '/datasets/CombinedMovieActorDS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ParquetFinalOnlineCatalogDS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "StagingDataLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "catalog/initialLoad",
-						"fileSystem": "prod"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/StagingDataLinkedService')]"
 			]
 		}
 	]
