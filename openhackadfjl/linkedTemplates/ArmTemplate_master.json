@@ -172,18 +172,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"FileServerFourthCoffee_password": {
-						"value": "[parameters('FileServerFourthCoffee_password')]"
-					},
-					"SqlServerVanArsDelLinkedService_connectionString": {
-						"value": "[parameters('SqlServerVanArsDelLinkedService_connectionString')]"
-					},
-					"FileServerFourthCoffee_properties_typeProperties_host": {
-						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_host')]"
-					},
-					"FileServerFourthCoffee_properties_typeProperties_userId": {
-						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_userId')]"
 					}
 				}
 			},
@@ -204,6 +192,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"FileServerFourthCoffee_password": {
+						"value": "[parameters('FileServerFourthCoffee_password')]"
+					},
+					"SqlServerVanArsDelLinkedService_connectionString": {
+						"value": "[parameters('SqlServerVanArsDelLinkedService_connectionString')]"
+					},
+					"FileServerFourthCoffee_properties_typeProperties_host": {
+						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_host')]"
+					},
+					"FileServerFourthCoffee_properties_typeProperties_userId": {
+						"value": "[parameters('FileServerFourthCoffee_properties_typeProperties_userId')]"
 					}
 				}
 			},

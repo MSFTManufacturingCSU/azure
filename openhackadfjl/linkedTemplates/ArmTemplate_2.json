@@ -6,12 +6,158 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "openhackadfjl"
+		},
+		"FileServerFourthCoffee_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'FileServerFourthCoffee'"
+		},
+		"SqlServerVanArsDelLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServerVanArsDelLinkedService'"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "c:\\"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "openhackadmin"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/vanarsdelTransDS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RawMovie",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Transactions",
+						"folderPath": "vanarsdel",
+						"fileSystem": "raw"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "TransactionID",
+						"type": "UTF8"
+					},
+					{
+						"name": "CustomerID",
+						"type": "UTF8"
+					},
+					{
+						"name": "MovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "RentalDate",
+						"type": "INT32"
+					},
+					{
+						"name": "ReturnDate",
+						"type": "INT32"
+					},
+					{
+						"name": "RentalCost",
+						"type": "DECIMAL",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LateFee",
+						"type": "DECIMAL",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "RewindFlag",
+						"type": "BOOLEAN"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "DATE"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "DATE"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FileServerFourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('FileServerFourthCoffee_properties_typeProperties_host')]",
+					"userId": "[parameters('FileServerFourthCoffee_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('FileServerFourthCoffee_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServerVanArsDelLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlServerVanArsDelLinkedService_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime4onpremiseSQL",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "prod"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/cloudSales')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -333,7 +479,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FileServerFourthCoffee')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SqlServerTable1')]",
@@ -366,7 +514,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServerVanArsDelLinkedService')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/VanArsDelSQLViewDataset')]",
@@ -394,7 +544,9 @@
 					"table": "StageTables"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServerVanArsDelLinkedService')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/flattenMovies')]",
@@ -429,10 +581,67 @@
 							"name": "DerivedColumn1"
 						}
 					],
-					"script": "source(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\twildcardPaths:['movies/**']) ~> source1\nsource1 foldDown(unroll(actors, actors),\n\tmapColumn(\n\t\t{_attachments},\n\t\t{_etag},\n\t\t{_rid},\n\t\t{_self},\n\t\t{_ts},\n\t\tavailabilityDate,\n\t\tgenre,\n\t\tid,\n\t\trating,\n\t\treleaseYear,\n\t\truntime,\n\t\tstreamingAvailabilityDate,\n\t\ttier,\n\t\ttitle,\n\t\tname = actors.name\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> Flatten1\nFlatten1 derive(SourceSystemId = 1) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['onlineMoviesFlattened'],\n\ttruncate: true,\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+					"script": "source(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\twildcardPaths:['movies/**']) ~> source1\nsource1 foldDown(unroll(actors, actors),\n\tmapColumn(\n\t\t{_attachments},\n\t\t{_etag},\n\t\t{_rid},\n\t\t{_self},\n\t\t{_ts},\n\t\tavailabilityDate,\n\t\tgenre,\n\t\tid,\n\t\trating,\n\t\treleaseYear,\n\t\truntime,\n\t\tstreamingAvailabilityDate,\n\t\ttier,\n\t\ttitle,\n\t\tname = actors.name\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> Flatten1\nFlatten1 derive(SourceSystemId = 1) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['onlineMoviesFlattened'],\n\ttruncate: true,\n\tmapColumn(\n\t\tSourceSystemId,\n\t\tSourceSystemMovieId = id,\n\t\tSouthridgeMovieId = id,\n\t\tPhysicalAvailabilityDate = availabilityDate,\n\t\tStreamingAvailabilityDate = streamingAvailabilityDate,\n\t\tGenre = genre,\n\t\tTitle = title,\n\t\tRating = rating,\n\t\tRuntimeMinutes = runtime,\n\t\tTheatricalReleaseYear = releaseYear,\n\t\tActorName = name\n\t),\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/prodMovieCatalogFlow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ParquetOnpremiseMovies",
+								"type": "DatasetReference"
+							},
+							"name": "onpremisescombinedmovies"
+						},
+						{
+							"dataset": {
+								"referenceName": "ParquetOnpremisesMovieActors",
+								"type": "DatasetReference"
+							},
+							"name": "onpremisescombinedmovieactors"
+						},
+						{
+							"dataset": {
+								"referenceName": "ParquetOnlineMovies",
+								"type": "DatasetReference"
+							},
+							"name": "onlinemovies"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Parquet3",
+								"type": "DatasetReference"
+							},
+							"name": "finalCatalog"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Join1"
+						},
+						{
+							"name": "Select1"
+						},
+						{
+							"name": "Join2"
+						}
+					],
+					"script": "source(output(\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tCategory as string,\n\t\tRating as string,\n\t\tRunTimeMin as integer,\n\t\tReleaseDate as date,\n\t\tOnlineMovieID as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovies\nsource(output(\n\t\tMovieActorID as string,\n\t\tMovieID as string,\n\t\tActorID as string,\n\t\tOnlineMovieID as string,\n\t\tActorName as string,\n\t\tGender as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onpremisescombinedmovieactors\nsource(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string,\n\t\tname as string,\n\t\tSourceSystemId as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> onlinemovies\nonpremisescombinedmovies, onpremisescombinedmovieactors join(onpremisescombinedmovies@OnlineMovieID == onpremisescombinedmovieactors@OnlineMovieID,\n\tjoinType:'right',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tSourceSystemMovieId = onpremisescombinedmovieactors@MovieID,\n\t\tTitle = MovieTitle,\n\t\tGenre = Category,\n\t\tRating,\n\t\tRuntimeMinutes = RunTimeMin,\n\t\tTheatricalReleaseDate = ReleaseDate,\n\t\tActorId = ActorID,\n\t\tSouthridgeMovieId = onpremisescombinedmovieactors@OnlineMovieID,\n\t\tActorName,\n\t\tActorGender = Gender,\n\t\tSourceSystemId = onpremisescombinedmovieactors@SourceSystemId\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1, onlinemovies join(Select1@SourceSystemId == onlinemovies@SourceSystemId,\n\tjoinType:'outer',\n\tbroadcast: 'auto')~> Join2\nJoin2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> finalCatalog"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Parquet3')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/stageOnPremiseTransactionDF')]",
@@ -506,7 +715,9 @@
 					"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tRentalDate as integer,\n\t\tReturnDate as integer,\n\t\tRentalCost as decimal(19,4),\n\t\tLateFee as decimal(19,4),\n\t\tRewindFlag as boolean,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelTransactionsSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> VanarsdelMovieMapSr\nsource(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tRentalDate as string,\n\t\tReturnDate as string,\n\t\tRentalCost as string,\n\t\tLateFee as string,\n\t\tRewindFlag as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeTransactionSr\nsource(output(\n\t\tMovieID as string,\n\t\tOnlineMovieID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> FourthCoffeeMovieMapSr\nVanarsdelTransactionsSr, VanarsdelMovieMapSr join(VanarsdelTransactionsSr@MovieID == VanarsdelMovieMapSr@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join1\nJoin1 select(mapColumn(\n\t\tTransactionID,\n\t\tCustomerID,\n\t\tMovieID = VanarsdelTransactionsSr@MovieID,\n\t\tRentalDate,\n\t\tReturnDate,\n\t\tRentalCost,\n\t\tLateFee,\n\t\tRewindFlag,\n\t\tCreatedDate,\n\t\tUpdatedDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1 derive(SourceSystemId = 3,\n\t\tRentalDate = toDate(concat(left(toString(RentalDate), 4), '-', left(right(toString(RentalDate),4), 2), '-', right(right(toString(RentalDate), 4), 2)), \"yyyy-MM-dd\"),\n\t\tReturnDate = toDate(concat(left(toString(ReturnDate), 4), '-', left(right(toString(ReturnDate),4), 2), '-', right(right(toString(ReturnDate), 4), 2)), \"yyyy-MM-dd\"),\n\t\tRentalCost = toDecimal(RentalCost),\n\t\tLateFee = toDecimal(LateFee)) ~> DerivedColumn1\nFourthCoffeeTransactionSr, FourthCoffeeMovieMapSr join(FourthCoffeeTransactionSr@MovieID == FourthCoffeeMovieMapSr@MovieID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join2\nJoin2 select(mapColumn(\n\t\tTransactionID,\n\t\tCustomerID,\n\t\tMovieID = FourthCoffeeTransactionSr@MovieID,\n\t\tRentalDate,\n\t\tReturnDate,\n\t\tRentalCost,\n\t\tLateFee,\n\t\tRewindFlag,\n\t\tCreatedDate,\n\t\tUpdatedDate,\n\t\tOnlineMovieID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nSelect2 derive(SourceSystemId = 2,\n\t\tRentalDate = toDate(concat(left(toString(RentalDate), 4), '-', left(right(toString(RentalDate),4), 2), '-', right(right(toString(RentalDate), 4), 2)), \"yyyy-MM-dd\"),\n\t\tReturnDate = toDate(concat(left(toString(ReturnDate), 4), '-', left(right(toString(ReturnDate),4), 2), '-', right(right(toString(ReturnDate), 4), 2)), \"yyyy-MM-dd\"),\n\t\tLateFee = toDecimal(LateFee),\n\t\tRentalCost = toDecimal(RentalCost),\n\t\tRewindFlag = toBoolean(toString(RewindFlag)),\n\t\tCreatedDate = toDate(CreatedDate),\n\t\tUpdatedDate = toDate(UpdatedDate)) ~> DerivedColumn2\nDerivedColumn1, DerivedColumn2 union(byName: true)~> Union1\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['combinedOnPremTransactions'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/vanarsdelTransDS')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/stageOnpremiseMovieDF')]",
@@ -722,6 +933,50 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/FourthCoffeeCSVFiles')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/prodMovieCatalog')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "prodMovieCatalogFlow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"onpremisescombinedmovies": {},
+									"onpremisescombinedmovieactors": {},
+									"onlinemovies": {},
+									"finalCatalog": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/prodMovieCatalogFlow')]"
 			]
 		},
 		{

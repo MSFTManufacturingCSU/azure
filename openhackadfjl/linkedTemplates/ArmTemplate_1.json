@@ -6,22 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "openhackadfjl"
-		},
-		"FileServerFourthCoffee_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'FileServerFourthCoffee'"
-		},
-		"SqlServerVanArsDelLinkedService_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'SqlServerVanArsDelLinkedService'"
-		},
-		"FileServerFourthCoffee_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "c:\\"
-		},
-		"FileServerFourthCoffee_properties_typeProperties_userId": {
-			"type": "string",
-			"defaultValue": "openhackadmin"
 		}
 	},
 	"variables": {
@@ -354,6 +338,205 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ParquetOnlineMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "onlineMoviesFlattened",
+						"folderPath": "onlineMovies",
+						"fileSystem": "stage"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "_attachments",
+						"type": "UTF8"
+					},
+					{
+						"name": "_etag",
+						"type": "UTF8"
+					},
+					{
+						"name": "_rid",
+						"type": "UTF8"
+					},
+					{
+						"name": "_self",
+						"type": "UTF8"
+					},
+					{
+						"name": "_ts",
+						"type": "INT32"
+					},
+					{
+						"name": "availabilityDate",
+						"type": "INT96"
+					},
+					{
+						"name": "genre",
+						"type": "UTF8"
+					},
+					{
+						"name": "id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rating",
+						"type": "UTF8"
+					},
+					{
+						"name": "releaseYear",
+						"type": "INT_16"
+					},
+					{
+						"name": "runtime",
+						"type": "INT_16"
+					},
+					{
+						"name": "streamingAvailabilityDate",
+						"type": "INT96"
+					},
+					{
+						"name": "tier",
+						"type": "INT_16"
+					},
+					{
+						"name": "title",
+						"type": "UTF8"
+					},
+					{
+						"name": "name",
+						"type": "UTF8"
+					},
+					{
+						"name": "SourceSystemId",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ParquetOnpremiseMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "combinedOnPremiseMovies",
+						"folderPath": "combinedMovies",
+						"fileSystem": "stage"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "MovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "MovieTitle",
+						"type": "UTF8"
+					},
+					{
+						"name": "Category",
+						"type": "UTF8"
+					},
+					{
+						"name": "Rating",
+						"type": "UTF8"
+					},
+					{
+						"name": "RunTimeMin",
+						"type": "INT32"
+					},
+					{
+						"name": "ReleaseDate",
+						"type": "DATE"
+					},
+					{
+						"name": "OnlineMovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "SourceSystemId",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ParquetOnpremisesMovieActors')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StagingDataLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "combinedMovieActors",
+						"folderPath": "combinedMovieActors",
+						"fileSystem": "stage"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "MovieActorID",
+						"type": "UTF8"
+					},
+					{
+						"name": "MovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ActorID",
+						"type": "UTF8"
+					},
+					{
+						"name": "OnlineMovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ActorName",
+						"type": "UTF8"
+					},
+					{
+						"name": "Gender",
+						"type": "UTF8"
+					},
+					{
+						"name": "SourceSystemId",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/VanardselMovieMapDS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -603,114 +786,6 @@
 					"quoteChar": "\""
 				},
 				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/vanarsdelTransDS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "RawMovie",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Transactions",
-						"folderPath": "vanarsdel",
-						"fileSystem": "raw"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "TransactionID",
-						"type": "UTF8"
-					},
-					{
-						"name": "CustomerID",
-						"type": "UTF8"
-					},
-					{
-						"name": "MovieID",
-						"type": "UTF8"
-					},
-					{
-						"name": "RentalDate",
-						"type": "INT32"
-					},
-					{
-						"name": "ReturnDate",
-						"type": "INT32"
-					},
-					{
-						"name": "RentalCost",
-						"type": "DECIMAL",
-						"precision": 19,
-						"scale": 4
-					},
-					{
-						"name": "LateFee",
-						"type": "DECIMAL",
-						"precision": 19,
-						"scale": 4
-					},
-					{
-						"name": "RewindFlag",
-						"type": "BOOLEAN"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "DATE"
-					},
-					{
-						"name": "UpdatedDate",
-						"type": "DATE"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/FileServerFourthCoffee')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "FileServer",
-				"typeProperties": {
-					"host": "[parameters('FileServerFourthCoffee_properties_typeProperties_host')]",
-					"userId": "[parameters('FileServerFourthCoffee_properties_typeProperties_userId')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('FileServerFourthCoffee_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime1",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SqlServerVanArsDelLinkedService')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('SqlServerVanArsDelLinkedService_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "integrationRuntime4onpremiseSQL",
-					"type": "IntegrationRuntimeReference"
-				}
 			},
 			"dependsOn": []
 		}
