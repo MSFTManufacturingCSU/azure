@@ -1,5 +1,5 @@
 {
-	"name": "Parquet3",
+	"name": "ParquetFinalOnpremisesCatalog",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "StagingDataLinkedService",
