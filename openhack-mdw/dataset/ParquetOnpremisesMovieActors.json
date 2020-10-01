@@ -1,0 +1,50 @@
+{
+	"name": "ParquetOnpremisesMovieActors",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "StagingDataLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "combinedMovieActors",
+				"folderPath": "combinedMovieActors",
+				"fileSystem": "stage"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "MovieActorID",
+				"type": "UTF8"
+			},
+			{
+				"name": "MovieID",
+				"type": "UTF8"
+			},
+			{
+				"name": "ActorID",
+				"type": "UTF8"
+			},
+			{
+				"name": "OnlineMovieID",
+				"type": "UTF8"
+			},
+			{
+				"name": "ActorName",
+				"type": "UTF8"
+			},
+			{
+				"name": "Gender",
+				"type": "UTF8"
+			},
+			{
+				"name": "SourceSystemId",
+				"type": "INT32"
+			}
+		]
+	}
+}

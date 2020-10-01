@@ -1,0 +1,86 @@
+{
+	"name": "ParquetOnlineMovies",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "StagingDataLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "onlineMoviesFlattened",
+				"folderPath": "onlineMovies",
+				"fileSystem": "stage"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "_attachments",
+				"type": "UTF8"
+			},
+			{
+				"name": "_etag",
+				"type": "UTF8"
+			},
+			{
+				"name": "_rid",
+				"type": "UTF8"
+			},
+			{
+				"name": "_self",
+				"type": "UTF8"
+			},
+			{
+				"name": "_ts",
+				"type": "INT32"
+			},
+			{
+				"name": "availabilityDate",
+				"type": "INT96"
+			},
+			{
+				"name": "genre",
+				"type": "UTF8"
+			},
+			{
+				"name": "id",
+				"type": "UTF8"
+			},
+			{
+				"name": "rating",
+				"type": "UTF8"
+			},
+			{
+				"name": "releaseYear",
+				"type": "INT_16"
+			},
+			{
+				"name": "runtime",
+				"type": "INT_16"
+			},
+			{
+				"name": "streamingAvailabilityDate",
+				"type": "INT96"
+			},
+			{
+				"name": "tier",
+				"type": "INT_16"
+			},
+			{
+				"name": "title",
+				"type": "UTF8"
+			},
+			{
+				"name": "name",
+				"type": "UTF8"
+			},
+			{
+				"name": "SourceSystemId",
+				"type": "INT32"
+			}
+		]
+	}
+}
