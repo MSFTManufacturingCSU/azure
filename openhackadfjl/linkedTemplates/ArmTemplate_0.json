@@ -43,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'openhackStorageAcctLinkedService'"
 		},
+		"ProductionStorageLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
+		},
 		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
@@ -64,6 +68,10 @@
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
 		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		}
@@ -250,6 +258,23 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductionStorageLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
+					}
+				}
 			},
 			"dependsOn": []
 		},
@@ -447,54 +472,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/CosmosDb1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedFourthCoffeeMovieDS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "RawMovie",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Movies.csv",
-						"folderPath": "fourthCoffee",
-						"fileSystem": "raw"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/RawMovie')]"
 			]
 		}
 	]

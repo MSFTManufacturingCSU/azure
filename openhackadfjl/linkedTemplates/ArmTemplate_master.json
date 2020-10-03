@@ -51,6 +51,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'openhackStorageAcctLinkedService'"
 		},
+		"ProductionStorageLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
+		},
 		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
@@ -80,6 +84,10 @@
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
 		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
@@ -137,6 +145,9 @@
 					"openhackStorageAcctLinkedService_accountKey": {
 						"value": "[parameters('openhackStorageAcctLinkedService_accountKey')]"
 					},
+					"ProductionStorageLinkedService_accountKey": {
+						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
+					},
 					"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage4VanArsDel_properties_typeProperties_url')]"
 					},
@@ -154,6 +165,9 @@
 					},
 					"openhackStorageAcctLinkedService_properties_typeProperties_url": {
 						"value": "[parameters('openhackStorageAcctLinkedService_properties_typeProperties_url')]"
+					},
+					"ProductionStorageLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]"
 					}
 				}
 			},
