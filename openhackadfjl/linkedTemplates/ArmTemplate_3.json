@@ -13,6 +13,99 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/stageOnpremiseMovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "stageOnPremiseMoviesDF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "stageOnpremiseMovieDF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VanarsdelMovieSr": {},
+									"VanarsdelMovieMap": {},
+									"FourthCoffeeMovieSr": {},
+									"FourthCoffeeMovieMap": {},
+									"VanarsdelMoveActors": {},
+									"VanarsdelActorsSr": {},
+									"FourthCoffeeMovieActorsSr": {},
+									"FourthCoffeeActorsSr": {},
+									"sink1": {},
+									"sink2": {},
+									"sink3": {},
+									"sink4": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/stageOnpremiseTransactions')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "stageOnPremiseTransactionDF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"VanarsdelTransactionsSr": {},
+									"VanarsdelMovieMapSr": {},
+									"FourthCoffeeTransactionSr": {},
+									"FourthCoffeeMovieMapSr": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/vanarsdel')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
