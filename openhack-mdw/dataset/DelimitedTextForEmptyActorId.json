@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "catalog/initialLoad/Errors",
+				"folderPath": "errors",
 				"fileSystem": "prod"
 			},
 			"columnDelimiter": ",",
