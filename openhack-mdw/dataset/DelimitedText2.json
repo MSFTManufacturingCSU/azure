@@ -1,0 +1,22 @@
+{
+	"name": "DelimitedText2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RawMovie",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "vanarsdel/Errors",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
