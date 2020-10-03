@@ -1,0 +1,22 @@
+{
+	"name": "DelimitedTextForEmptyActorId",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ProductionStorageLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "catalog/initialLoad/Errors",
+				"fileSystem": "prod"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
