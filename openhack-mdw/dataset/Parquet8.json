@@ -1,0 +1,20 @@
+{
+	"name": "Parquet8",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ProductionStorageLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "customers",
+				"fileSystem": "prod"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
