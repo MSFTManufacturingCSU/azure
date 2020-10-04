@@ -17,6 +17,34 @@
 						"type": "DatasetReference"
 					},
 					"name": "fourthCoffeeCustomrSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "onlineSalesCustomerDS",
+						"type": "DatasetReference"
+					},
+					"name": "SalesCustomerSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "onlineStreamingCustomerSr",
+						"type": "DatasetReference"
+					},
+					"name": "StreamingCustomerSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "Parquet4",
+						"type": "DatasetReference"
+					},
+					"name": "SalesAddressSr"
+				},
+				{
+					"dataset": {
+						"referenceName": "Parquet5",
+						"type": "DatasetReference"
+					},
+					"name": "StreamingAddressSr"
 				}
 			],
 			"sinks": [
@@ -33,7 +61,7 @@
 					"name": "Union1"
 				}
 			],
-			"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> vanarsdelCustomerSr\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> fourthCoffeeCustomrSr\nvanarsdelCustomerSr, fourthCoffeeCustomrSr union(byName: true)~> Union1\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['CombinedOnpremisesCustomers'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+			"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> vanarsdelCustomerSr\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> fourthCoffeeCustomrSr\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SalesCustomerSr\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> StreamingCustomerSr\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> SalesAddressSr\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> StreamingAddressSr\nvanarsdelCustomerSr, fourthCoffeeCustomrSr union(byName: true)~> Union1\nUnion1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tpartitionFileNames:['CombinedOnpremisesCustomers'],\n\tpartitionBy('hash', 1),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 		}
 	}
 }

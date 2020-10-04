@@ -1,0 +1,58 @@
+{
+	"name": "Parquet4",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RawMovie",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "dbo.Addresses",
+				"folderPath": "cloudSales",
+				"fileSystem": "raw"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "AddressID",
+				"type": "UTF8"
+			},
+			{
+				"name": "CustomerID",
+				"type": "UTF8"
+			},
+			{
+				"name": "AddressLine1",
+				"type": "UTF8"
+			},
+			{
+				"name": "AddressLine2",
+				"type": "UTF8"
+			},
+			{
+				"name": "City",
+				"type": "UTF8"
+			},
+			{
+				"name": "State",
+				"type": "UTF8"
+			},
+			{
+				"name": "ZipCode",
+				"type": "UTF8"
+			},
+			{
+				"name": "CreatedDate",
+				"type": "DATE"
+			},
+			{
+				"name": "UpdatedDate",
+				"type": "DATE"
+			}
+		]
+	}
+}
