@@ -19,7 +19,9 @@
 						"type": "ParquetSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
-							"recursive": true
+							"recursive": true,
+							"wildcardFolderPath": "CombinedCustomers",
+							"wildcardFileName": "*.*"
 						}
 					},
 					"sink": {
