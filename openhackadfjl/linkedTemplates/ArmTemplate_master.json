@@ -23,9 +23,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'CosmosDb1'"
 		},
+		"DWjlopenhackmdwLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'DWjlopenhackmdwLinkedService'"
+		},
 		"FileServerFourthCoffee_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'FileServerFourthCoffee'"
+		},
+		"ProductionStorageLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
 		},
 		"RawCloudSales_accountKey": {
 			"type": "secureString",
@@ -51,10 +59,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'openhackStorageAcctLinkedService'"
 		},
-		"ProductionStorageLinkedService_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
-		},
 		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
@@ -66,6 +70,10 @@
 		"FileServerFourthCoffee_properties_typeProperties_userId": {
 			"type": "string",
 			"defaultValue": "openhackadmin"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
 		"RawCloudSales_properties_typeProperties_url": {
 			"type": "string",
@@ -84,10 +92,6 @@
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
 		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://southbridge.dfs.core.windows.net"
-		},
-		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
@@ -130,6 +134,12 @@
 					"CosmosDb1_connectionString": {
 						"value": "[parameters('CosmosDb1_connectionString')]"
 					},
+					"DWjlopenhackmdwLinkedService_connectionString": {
+						"value": "[parameters('DWjlopenhackmdwLinkedService_connectionString')]"
+					},
+					"ProductionStorageLinkedService_accountKey": {
+						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
+					},
 					"RawCloudSales_accountKey": {
 						"value": "[parameters('RawCloudSales_accountKey')]"
 					},
@@ -145,11 +155,11 @@
 					"openhackStorageAcctLinkedService_accountKey": {
 						"value": "[parameters('openhackStorageAcctLinkedService_accountKey')]"
 					},
-					"ProductionStorageLinkedService_accountKey": {
-						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
-					},
 					"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage4VanArsDel_properties_typeProperties_url')]"
+					},
+					"ProductionStorageLinkedService_properties_typeProperties_url": {
+						"value": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]"
 					},
 					"RawCloudSales_properties_typeProperties_url": {
 						"value": "[parameters('RawCloudSales_properties_typeProperties_url')]"
@@ -165,9 +175,6 @@
 					},
 					"openhackStorageAcctLinkedService_properties_typeProperties_url": {
 						"value": "[parameters('openhackStorageAcctLinkedService_properties_typeProperties_url')]"
-					},
-					"ProductionStorageLinkedService_properties_typeProperties_url": {
-						"value": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]"
 					}
 				}
 			},

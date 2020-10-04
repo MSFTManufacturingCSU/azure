@@ -17,7 +17,13 @@
 		"CosmosDb1_connectionString": {
 			"value": ""
 		},
+		"DWjlopenhackmdwLinkedService_connectionString": {
+			"value": ""
+		},
 		"FileServerFourthCoffee_password": {
+			"value": ""
+		},
+		"ProductionStorageLinkedService_accountKey": {
 			"value": ""
 		},
 		"RawCloudSales_accountKey": {
@@ -38,9 +44,6 @@
 		"openhackStorageAcctLinkedService_accountKey": {
 			"value": ""
 		},
-		"ProductionStorageLinkedService_accountKey": {
-			"value": ""
-		},
 		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
 			"value": "https://southbridge.dfs.core.windows.net"
 		},
@@ -49,6 +52,9 @@
 		},
 		"FileServerFourthCoffee_properties_typeProperties_userId": {
 			"value": "openhackadmin"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
 		},
 		"RawCloudSales_properties_typeProperties_url": {
 			"value": "https://southbridge.dfs.core.windows.net"
@@ -63,9 +69,6 @@
 			"value": "https://southbridge.dfs.core.windows.net"
 		},
 		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
-			"value": "https://southbridge.dfs.core.windows.net"
-		},
-		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"value": "https://southbridge.dfs.core.windows.net"
 		}
 	}

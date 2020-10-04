@@ -23,6 +23,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'CosmosDb1'"
 		},
+		"DWjlopenhackmdwLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'DWjlopenhackmdwLinkedService'"
+		},
+		"ProductionStorageLinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
+		},
 		"RawCloudSales_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'RawCloudSales'"
@@ -43,11 +51,11 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'openhackStorageAcctLinkedService'"
 		},
-		"ProductionStorageLinkedService_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'ProductionStorageLinkedService'"
-		},
 		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://southbridge.dfs.core.windows.net"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
@@ -68,10 +76,6 @@
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		},
 		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://southbridge.dfs.core.windows.net"
-		},
-		"ProductionStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://southbridge.dfs.core.windows.net"
 		}
@@ -132,6 +136,36 @@
 				"type": "CosmosDb",
 				"typeProperties": {
 					"connectionString": "[parameters('CosmosDb1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DWjlopenhackmdwLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('DWjlopenhackmdwLinkedService_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductionStorageLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -262,21 +296,40 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ProductionStorageLinkedService')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/dailyupdateCatagories')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('ProductionStorageLinkedService_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('ProductionStorageLinkedService_accountKey')]"
+				"activities": [
+					{
+						"name": "Stored procedure Dim Catagories",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[UpdateDimCategories]"
+						},
+						"linkedServiceName": {
+							"referenceName": "DWjlopenhackmdwLinkedService",
+							"type": "LinkedServiceReference"
+						}
 					}
-				}
+				],
+				"folder": {
+					"name": "Daily"
+				},
+				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DWjlopenhackmdwLinkedService')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlCloudSales')]",
@@ -388,90 +441,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzuresTreamingDatabase')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CombinedMovieActorDS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "StagingDataLinkedService",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "combinedMovieActors",
-						"fileSystem": "stage"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/StagingDataLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CosmosDbSqlApiCollection1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "CosmosDb1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "CosmosDbSqlApiCollection",
-				"schema": {
-					"type": "object",
-					"properties": {
-						"actors": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}
-						},
-						"availabilityDate": {
-							"type": "string"
-						},
-						"genre": {
-							"type": "string"
-						},
-						"rating": {
-							"type": "string"
-						},
-						"releaseYear": {
-							"type": "integer"
-						},
-						"runtime": {
-							"type": "integer"
-						},
-						"streamingAvailabilityDate": {
-							"type": "string"
-						},
-						"tier": {
-							"type": "integer"
-						},
-						"title": {
-							"type": "string"
-						}
-					}
-				},
-				"typeProperties": {
-					"collectionName": "movies"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/CosmosDb1')]"
 			]
 		}
 	]
