@@ -3410,7 +3410,7 @@
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": "combinedCustomers",
-									"wildcardFileName": "*.*"
+									"wildcardFileName": "*"
 								}
 							},
 							"sink": {
