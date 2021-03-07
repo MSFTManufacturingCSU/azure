@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Machine Learning Execute Pipeline1",
-				"type": "AzureMLExecutePipeline",
+				"name": "Ddiabetescsv2synapse",
+				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
@@ -15,34 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"experimentName": "myexptestfromadf",
-					"mlPipelineId": "a1bda5dd-5036-4c2b-9bd1-423959cb50b3"
-				},
-				"linkedServiceName": {
-					"referenceName": "AzureMLService1",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Data flow1",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "Machine Learning Execute Pipeline1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
+					"dataflow": {
+						"referenceName": "diabetescsv2synapse-df1",
+						"type": "DataFlowReference"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
