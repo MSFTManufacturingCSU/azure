@@ -23,7 +23,7 @@
 				}
 			],
 			"transformations": [],
-			"script": "source(output(\n\t\tPatientID as integer,\n\t\tPregnancies as short,\n\t\tPlasmaGlucose as short,\n\t\tDiastolicBloodPressure as short,\n\t\tTricepsThickness as short,\n\t\tSerumInsulin as short,\n\t\tBMI as double,\n\t\tDiabetesPedigree as double,\n\t\tAge as short,\n\t\tDiabetic as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 sink(input(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+			"script": "source(output(\n\t\tPatientID as integer,\n\t\tPregnancies as short,\n\t\tPlasmaGlucose as short,\n\t\tDiastolicBloodPressure as short,\n\t\tTricepsThickness as short,\n\t\tSerumInsulin as short,\n\t\tBMI as double,\n\t\tDiabetesPedigree as double,\n\t\tAge as short,\n\t\tDiabetic as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 sink(input(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 		}
 	}
 }
