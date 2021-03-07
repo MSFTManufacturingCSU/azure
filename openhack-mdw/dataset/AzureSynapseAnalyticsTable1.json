@@ -17,6 +17,10 @@
 				"name": "MovieCategoryDescription",
 				"type": "varchar"
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Diabetes"
+		}
 	}
 }
