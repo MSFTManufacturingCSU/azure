@@ -1,0 +1,102 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "jlopenhackmdw"
+		},
+		"AzureDataLakeStorage4VanArsDel_accountKey": {
+			"value": ""
+		},
+		"AzureFileStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureMLDefaultBlobStorage_connectionString": {
+			"value": ""
+		},
+		"AzureMLService1_servicePrincipalKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"AzureSynapseAnalytics1_connectionString": {
+			"value": ""
+		},
+		"AzuresTreamingDatabase_connectionString": {
+			"value": ""
+		},
+		"CosmosDb1_connectionString": {
+			"value": ""
+		},
+		"DWjlopenhackmdwLinkedService_connectionString": {
+			"value": ""
+		},
+		"FileServerFourthCoffee_password": {
+			"value": ""
+		},
+		"ProductionStorageLinkedService_accountKey": {
+			"value": ""
+		},
+		"RawCloudSales_accountKey": {
+			"value": ""
+		},
+		"RawMovie_accountKey": {
+			"value": ""
+		},
+		"RawStreaming_accountKey": {
+			"value": ""
+		},
+		"StagingDataLinkedService_accountKey": {
+			"value": ""
+		},
+		"jlopenhackmdw-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"openhackStorageAcctLinkedService_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorage4VanArsDel_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"AzureMLService1_properties_typeProperties_subscriptionId": {
+			"value": "7d8b9ec4-dd88-4dd8-89a7-9fb720641a6a"
+		},
+		"AzureMLService1_properties_typeProperties_resourceGroupName": {
+			"value": "oh-dsdata-data"
+		},
+		"AzureMLService1_properties_typeProperties_servicePrincipalId": {
+			"value": "a7f6e002-d9eb-44bc-ba6b-f835fa073130"
+		},
+		"AzureMLService1_properties_typeProperties_tenant": {
+			"value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_host": {
+			"value": "c:\\"
+		},
+		"FileServerFourthCoffee_properties_typeProperties_userId": {
+			"value": "openhackadmin"
+		},
+		"ProductionStorageLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawCloudSales_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawMovie_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"RawStreaming_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"StagingDataLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"jlopenhackmdw-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		},
+		"openhackStorageAcctLinkedService_properties_typeProperties_url": {
+			"value": "https://southbridge.dfs.core.windows.net"
+		}
+	}
+}
