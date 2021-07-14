@@ -1,6 +1,0 @@
-{
-	"name": "integrationRuntime4onpremiseSQL",
-	"properties": {
-		"type": "SelfHosted"
-	}
-}
