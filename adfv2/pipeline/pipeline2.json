@@ -33,7 +33,10 @@
 				"outputs": [
 					{
 						"referenceName": "AzureSqlDatabaseSinkDataset",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"sinkTableName": "defaul"
+						}
 					}
 				]
 			}
