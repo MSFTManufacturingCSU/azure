@@ -16,8 +16,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DynamicsAXSource",
-						"httpRequestTimeout": "00:05:00"
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
 					},
 					"sink": {
 						"type": "AzureSqlSink"
@@ -26,7 +30,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DynamicsAXResource1",
+						"referenceName": "Parquet1",
 						"type": "DatasetReference"
 					}
 				],
