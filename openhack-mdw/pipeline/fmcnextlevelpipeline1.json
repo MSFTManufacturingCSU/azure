@@ -1,0 +1,9 @@
+{
+	"name": "fmcnextlevelpipeline1",
+	"properties": {
+		"folder": {
+			"name": "FMC"
+		},
+		"annotations": []
+	}
+}
