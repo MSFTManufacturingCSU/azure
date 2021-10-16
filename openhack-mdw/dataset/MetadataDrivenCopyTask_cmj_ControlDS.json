@@ -1,0 +1,19 @@
+{
+	"name": "MetadataDrivenCopyTask_cmj_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedServiceForMetaData",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_cmj_20211015"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "MainControlTable"
+		}
+	}
+}
