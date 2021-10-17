@@ -109,7 +109,13 @@
 				"outputs": [
 					{
 						"referenceName": "FMCParquetStorage",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": {
+								"value": "@pipeline().parameters.filename",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
