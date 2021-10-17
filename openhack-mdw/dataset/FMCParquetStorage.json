@@ -1,0 +1,26 @@
+{
+	"name": "FMCParquetStorage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageFMC",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filename": {
+				"type": "string",
+				"defaultValue": "fmcfile"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "fmcdatasink",
+				"container": "fmcwkspcontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
