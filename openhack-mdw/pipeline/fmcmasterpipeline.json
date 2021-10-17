@@ -1,6 +1,27 @@
 {
 	"name": "fmcmasterpipeline",
 	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "fmcnextlevelpipeline1",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"filename": {
+							"value": "@concat(pipeline().TriggerTime, 'fmcdemo1')",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
 		"folder": {
 			"name": "FMC"
 		},
