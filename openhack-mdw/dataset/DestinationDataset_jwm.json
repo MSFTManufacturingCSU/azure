@@ -1,0 +1,17 @@
+{
+	"name": "DestinationDataset_jwm",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageFMC",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "fmcimages2"
+			}
+		}
+	}
+}
